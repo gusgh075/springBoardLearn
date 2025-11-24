@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 수정</title>
+</head>
+<body>
+
+<h2>게시글 수정</h2>
+
+<form id="updateForm">
+    <input type="hidden" id="id">
+
+    <div>
+        <label>제목</label><br>
+        <input type="text" id="title" required>
+    </div>
+
+    <div>
+        <label>작성자</label><br>
+        <input type="text" id="writer" required>
+    </div>
+
+    <div>
+        <label>내용</label><br>
+        <textarea id="content" rows="5" required></textarea>
+    </div>
+
+    <button type="submit">저장</button>
+    <button type="button" onclick="history.back()">취소</button>
+</form>
+
+<script>
+    const urlParams = new URLSearchParams(location.search);
+    const id = urlParams.get("id");
+
+    // 기존 데이터 로딩
+    async function loadBoard() {
+        const response = await fetch(`http://localhost:8080/boards/${id}`);
+        const board = await response.json();
+
+        document.getElementById("id").value = board.id;
+        document.getElementById("title").value = board.title;
+        document.getElementById("writer").value = board.writer;
+        document.getElementById("content").value = board.content;
+    }
+
+    loadBoard();
+
+    // 업데이트 요청
+    document.getElementById("updateForm").onsubmit = async function(e) {
+        e.preventDefault();
+
+        const updatedBoard = {
+            id: document.getElementById("id").value,
+            title: document.getElementById("title").value,
+            writer: document.getElementById("writer").value,
+            content: document.getElementById("content").value
+        };
+
+        const response = await fetch(`http://localhost:8080/boards/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedBoard)
+        });
+
+        if (response.ok) {
+            alert("수정되었습니다.");
+            location.href = `/board-detail.html?id=${id}`;
+        } else {
+            alert("수정 실패");
+        }
+    };
+</script>
+
+</body>
+</html>

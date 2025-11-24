@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 상세</title>
+</head>
+<body>
+
+<h2>게시글 상세</h2>
+<div>
+    <p><strong>ID:</strong> <span id="id"></span></p>
+    <p><strong>제목:</strong> <span id="title"></span></p>
+    <p><strong>작성자:</strong> <span id="writer"></span></p>
+    <p><strong>내용:</strong></p>
+    <p id="content"></p>
+</div>
+
+<button id="updateBtn">수정하기</button>
+<button id="deleteBtn">삭제하기</button>
+<button onclick="location.href='/board-list.html'">목록으로</button>
+
+<script>
+    // URL에서 id 추출
+    const urlParams = new URLSearchParams(location.search);
+    const id = urlParams.get("id");
+
+    // 상세 데이터 로드
+    async function loadDetail() {
+        const response = await fetch(`http://localhost:8080/boards/${id}`);
+        const board = await response.json();
+
+        document.getElementById("id").innerText = board.id;
+        document.getElementById("title").innerText = board.title;
+        document.getElementById("writer").innerText = board.writer;
+        document.getElementById("content").innerText = board.content;
+    }
+
+    loadDetail();
+
+    // 수정 페이지 이동
+    document.getElementById("updateBtn").onclick = function() {
+        location.href = `/board-update.html?id=${id}`;
+    };
+
+    // 삭제 요청
+    document.getElementById("deleteBtn").onclick = async function() {
+        if (!confirm("삭제할까요?")) return;
+
+        const response = await fetch(`http://localhost:8080/boards/${id}`, {
+            method: "DELETE"
+        });
+
+        if (response.ok) {
+            alert("삭제되었습니다.");
+            location.href = "board-list.html";
+        } else {
+            alert("삭제 실패");
+        }
+    };
+</script>
+
+</body>
+</html>
